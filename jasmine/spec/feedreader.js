@@ -23,7 +23,7 @@ $(function() {
         it('should have a URL and that URL should not be blank', function() {
             for(let feed of allFeeds) {
                 expect(feed.url).toBeDefined();
-                expect(feed.url).not.toBe('');
+                expect(feed.url).toBeTruthy();
             }
         });
 
@@ -33,24 +33,25 @@ $(function() {
         it('should have a name and that name should not be blank', function() {
             for(let feed of allFeeds) {
                 expect(feed.name).toBeDefined();
-                expect(feed.name).not.toBe('');
+                expect(feed.name).toBeTruthy();
             }
         });
     });
 
 
     describe('The menu', function() {
+        var body = $('body');
         /* Ensure the menu element is hidden by default */
         it('should hide the menu element by default', function() {
-            expect($('.menu-hidden').is(':visible')).toBeTruthy();
+            expect(body.hasClass('menu-hidden')).toBeTruthy();
         });
 
         it('should show the menu when the menu icon is clicked and the menu is hidden and should hide the menu when the menu icon is clicked again', function() {
             $('.menu-icon-link').trigger('click');
-            expect($('.menu-hidden').is(':visible')).toBeFalsy();
+            expect(body.hasClass('menu-hidden')).toBeFalsy();
 
             $('.menu-icon-link').trigger('click');
-            expect($('.menu-hidden').is(':visible')).toBeTruthy();
+            expect(body.hasClass('menu-hidden')).toBeTruthy();
         });
     });
 
@@ -65,7 +66,7 @@ $(function() {
         });
 
         it('should check that there is at least one entry in the feed container when the loadFeed function is called', function(done) {
-            expect($('.entry').length).toBeGreaterThan(0);
+            expect($('.feed .entry').length).toBeGreaterThan(0);
             done();
         });
 
@@ -75,14 +76,19 @@ $(function() {
         /* Ensures that when a new feed is loaded by the loadFeed function,
          * the content actually changes.
          */
-        var feed = $('.feed .entry');
+        var feedOne,
+            feedTwo;
         beforeEach(function(done) {
-            loadFeed(1, function() {
-                done();
+            loadFeed(0, function() {
+                feedOne = $('.feed').text();
+                loadFeed(1, function() {
+                    feedTwo = $('.feed').text();
+                    done();
+                });
             });
         });
         it('should ensure the feed content changes when a new feed is loaded by the loadFeed function', function(done) {
-            expect($('.feed .entry')).not.toEqual(feed);
+            expect(feedOne).not.toEqual(feedTwo);
             done();
         });
     });
